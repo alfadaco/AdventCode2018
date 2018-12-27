@@ -80,13 +80,15 @@ if __name__ == '__main__':
     for t in range(1, max_time + 1):
         # Check growing pattern
         new_plant_index = check_rule(plant_index, grow_rules)
-        removed_plant_index = check_rule(plant_index, destroy_rules)
 
-        plant_index.difference_update(removed_plant_index)
-        plant_index = plant_index.union(new_plant_index)
+        if new_plant_index == plant_index:
+            print('equal')
+        plant_index = new_plant_index
 
-        if t%1000 == 0:
+        if t % 1000 == 0:
             print('epoch ' + str(t))
+            print(plant_index)
+
             # print(gen_syntax(pot_status))
 
     score = 0
