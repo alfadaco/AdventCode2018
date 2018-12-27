@@ -1,12 +1,11 @@
 import data_12dec2018
 import re
+from matplotlib import pyplot as plt
 
 initial_state = data_12dec2018.initial_state
 rules = data_12dec2018.rules
 
-#n_generation = 20
-n_generation = 50*1000*1000*1000
-
+n_generation = 20
 
 def parse_syntax(phrase):
     parsed = []
@@ -40,16 +39,20 @@ def check_rule(old_plants, rules):
     satisfiyng_rule_idx = set()
     rule_halflength = 2
 
-    for p in range(min(old_plants) - rule_halflength, max(old_plants) + rule_halflength + 1):
-        for r in rules:
-            condition = True
-            for i in range(0, 2*rule_halflength + 1):
-                condition = condition and check_presence(old_plants, r[i], p - rule_halflength + i)
-                if not condition:
+    for central_pot in old_plants:
+        for p in range(central_pot - 2*rule_halflength - 1, central_pot + 2*rule_halflength + 2):
+            if p in satisfiyng_rule_idx:
+                continue
+
+            for r in rules:
+                condition = True
+                for i in range(0, 2*rule_halflength + 1):
+                    condition = condition and check_presence(old_plants, r[i], p - rule_halflength + i)
+                    if not condition:
+                        break
+                if condition:
+                    satisfiyng_rule_idx.add(p)
                     break
-            if condition:
-                satisfiyng_rule_idx.add(p)
-                break
     return satisfiyng_rule_idx
 
 
@@ -76,6 +79,7 @@ if __name__ == '__main__':
     # Growing up
     max_time = n_generation
     print('epoch 0')
+    history = [list(plant_index)]
     # print(gen_syntax(pot_status))
     for t in range(1, max_time + 1):
         # Check growing pattern
@@ -84,14 +88,28 @@ if __name__ == '__main__':
         if new_plant_index == plant_index:
             print('equal')
         plant_index = new_plant_index
+        history.append(list(plant_index))
 
         if t % 1000 == 0:
-            print('epoch ' + str(t))
-            print(plant_index)
+            plt.plot(list(plant_index), 'o')
+            plt.show(block=False)
 
-            # print(gen_syntax(pot_status))
+            score = 0
+            for p in plant_index:
+                score += p
+
+            print('epoch ' + str(t) + ' len=' + str(len(plant_index)) + ' score=' + str(score))
+            print(plant_index)
 
     score = 0
     for p in plant_index:
         score += p
     print('score = ' + str(score))
+
+
+# Score is given as
+# s = n_generation*46 + 6
+# why???
+n_generation = 50*1000*1000*1000
+score = n_generation*46 + 6
+print(str(n_generation) + ' score = ' + str(score))
