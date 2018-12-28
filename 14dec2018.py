@@ -41,16 +41,21 @@ current_recipes = list(range(0, n_elves))
 scores = int2digits(37)
 
 # Output info
-start_point = 2018
 length = 10
-end_point = start_point + length
+start_points = [9, 5, 18, 2018, data]
+for start_point in start_points:
+    end_point = start_point + length
 
-# Run game for n_turns
-while len(scores) < end_point:
-    #print(current_recipes, [scores[recipe] for recipe in current_recipes])
+    # Run game for n_turns
+    while len(scores) < end_point:
+        #print(current_recipes, [scores[recipe] for recipe in current_recipes])
 
-    # Combine current recipes
-    scores, current_recipes = combine_recipes(scores, current_recipes)
+        # Combine current recipes
+        scores, current_recipes = combine_recipes(scores, current_recipes)
+        if len(scores) % 1000 == 0:
+            print('arrived to ' + str(len(scores)))
+
+    print(''.join([str(d) for d in scores]))
 
 
-print('Scores = ' + ''.join([str(d) for d in scores[start_point:end_point]]))
+    print('Initial point ' + str(start_point) + ' Scores = ' + ''.join([str(d) for d in scores[start_point:end_point]]))
