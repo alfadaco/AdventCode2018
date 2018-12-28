@@ -54,6 +54,7 @@ current_recipes = list(range(0, n_elves))
 scores = int2digits(37) + ([None] * (start_point + length))
 current_length = 2
 
+<<<<<<< HEAD
 ##############
 ### Part 1 ###
 ##############
@@ -105,3 +106,24 @@ while current_length < preallocate:
 
 if not found:
     print('Not found...')
+=======
+# Output info
+length = 10
+start_points = [9, 5, 18, 2018, data]
+for start_point in start_points:
+    end_point = start_point + length
+
+    # Run game for n_turns
+    while len(scores) < end_point:
+        #print(current_recipes, [scores[recipe] for recipe in current_recipes])
+
+        # Combine current recipes
+        scores, current_recipes = combine_recipes(scores, current_recipes)
+        if len(scores) % 1000 == 0:
+            print('arrived to ' + str(len(scores)))
+
+    print(''.join([str(d) for d in scores]))
+
+
+    print('Initial point ' + str(start_point) + ' Scores = ' + ''.join([str(d) for d in scores[start_point:end_point]]))
+>>>>>>> 1fb74f915a66b7e2bd358f13abc26c99539b4d8d
