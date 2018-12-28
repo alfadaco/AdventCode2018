@@ -2,7 +2,7 @@ import numpy as np
 from enum import IntEnum
 import data_13dec2018
 
-map_literal = data_13dec2018.map
+map_literal = data_13dec2018.map#_test_part2
 
 
 class TurnAround(IntEnum):
@@ -119,8 +119,9 @@ if __name__ == '__main__':
     tick = -1
     while True:
         tick += 1
-    #for tick in range(0, max_tick):
-        print('tick ' + str(tick))
+        something_chrashed = False
+        if tick % 1000 == 0:
+            print('tick ' + str(tick))
         for i_r in range(0, map_size[0]):
             for i_c in range(0, map_size[1]):
                 if carts[i_r][i_c] is None:
@@ -143,7 +144,6 @@ if __name__ == '__main__':
                 elif direction == Direction.U:  new_r -= 1
                 elif direction == Direction.D:  new_r += 1
 
-
                 if carts[new_r][new_c] is None:
                     carts[new_r][new_c] = carts[i_r][i_c]
                     carts[i_r][i_c] = None
@@ -151,10 +151,15 @@ if __name__ == '__main__':
                 else:
                     carts[i_r][i_c] = None
                     carts[new_r][new_c] = None
-                    map[new_r][new_c] = 'X'
-                    # print_position(map, carts)
+                    something_chrashed = True
+                    print('tick ' + str(tick))
                     print('crash in ('+ str(new_c) + ', ' + str(new_r) + ')')
-                    exit()
 
-
-        # print_position(map, carts)
+        if something_chrashed:
+            remained = sum(sum(carts != None))
+            print('remained ' + str(remained) + ' carts')
+            if remained == 1:
+                pos = np.where(carts != None)
+                print('last cart is in (' + str(pos[1][0]) + ', ' + str(pos[0][0]) + ')')
+                exit()
+            #print_position(map, carts)
