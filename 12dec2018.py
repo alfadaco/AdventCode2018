@@ -5,7 +5,8 @@ from matplotlib import pyplot as plt
 initial_state = data_12dec2018.initial_state
 rules = data_12dec2018.rules
 
-n_generation = 20
+n_generation = 120
+
 
 def parse_syntax(phrase):
     parsed = []
@@ -40,7 +41,8 @@ def check_rule(old_plants, rules):
     rule_halflength = 2
 
     for central_pot in old_plants:
-        for p in range(central_pot - 2*rule_halflength - 1, central_pot + 2*rule_halflength + 2):
+        for p in range(central_pot - 2*rule_halflength - 1,
+                       central_pot + 2*rule_halflength + 2):
             if p in satisfiyng_rule_idx:
                 continue
 
@@ -65,6 +67,17 @@ if __name__ == '__main__':
         if pot_status[p] == 1:
             plant_index.add(p)
 
+    # Plot initial state
+    plt.figure(1)
+    plt.clf()
+    plt.grid()
+    plt.xlabel('Plants ids')
+    plt.ylabel('Generation')
+    plt.title('Puzzle 12 dec 2018')
+    plt.gca().invert_yaxis()
+    plt.plot(list(plant_index), [0]*len(plant_index), 'o')
+    plt.show(block=False)
+
     # Define growing pattern
     grow_rules = []
     destroy_rules = []
@@ -78,9 +91,10 @@ if __name__ == '__main__':
 
     # Growing up
     max_time = n_generation
-    print('epoch 0')
+    print('Epoch 0')
     history = [list(plant_index)]
     # print(gen_syntax(pot_status))
+    score_history = [sum(list(plant_index))]
     for t in range(1, max_time + 1):
         # Check growing pattern
         new_plant_index = check_rule(plant_index, grow_rules)
@@ -89,24 +103,51 @@ if __name__ == '__main__':
             print('equal')
         plant_index = new_plant_index
         history.append(list(plant_index))
+        
+        score_history.append(sum(list(plant_index)))        
+        
+        # Save stats at iteration 102
+        if t == 102:
+            score_at_102 = sum(list(plant_index))
+            number_of_plants_at_102 = len(plant_index)
 
-        if t % 1000 == 0:
-            plt.plot(list(plant_index), 'o')
+        # Print stats
+        if t % 1 == 0:
+            plt.plot(list(plant_index), [t]*len(plant_index), 'o')
             plt.show(block=False)
 
-            score = 0
-            for p in plant_index:
-                score += p
+            score = sum(list(plant_index))
+            print('Epoch ' + str(t) +
+                  ' len=' + str(len(plant_index)) +
+                  ' score=' + str(score))
+            #print(plant_index)
 
-            print('epoch ' + str(t) + ' len=' + str(len(plant_index)) + ' score=' + str(score))
-            print(plant_index)
+    # Newline
+    print(' ')
 
-    score = 0
-    for p in plant_index:
-        score += p
-    print('score = ' + str(score))
+    # Print last epoch
+    score = sum(list(plant_index))
+    print('Epoch ' + str(t) +
+          ' len=' + str(len(plant_index)) +
+          ' score=' + str(score))
 
+    # Fast forward to epoch...
+    n_generation = 50*1000*1000*1000
+    score = score_at_102 + (n_generation-102)*number_of_plants_at_102
+    print('Epoch ' + str(n_generation) +
+          ' len=' + str(len(plant_index)) +
+          ' score=' + str(score))
 
+    # Plot score evolution
+    plt.figure(2)
+    plt.clf()
+    plt.grid()
+    plt.xlabel('Generation')
+    plt.ylabel('Score')
+    plt.title('Puzzle 12 dec 2018')
+    plt.plot(range(0, max_time + 1), score_history)
+    plt.show(block=False)
+    
 # Score is given as
 # s = n_generation*46 + 6
 # why???
