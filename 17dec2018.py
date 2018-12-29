@@ -59,10 +59,6 @@ spring_col = 500 - min_x
 spring_row = 0
 matrix[spring_row][spring_col] = '+'
 
-##############
-### Part 1 ###
-##############
-
 # Simulate water falling
 k = 0
 max_row = 0
@@ -115,21 +111,29 @@ while changed:
     k += 1
 
 # Plot
-#height = 150
-#row_i = max(0, max_row-height) + 1
-#row_f = max(height, max_row) + 2
-#view = matrix[row_i:row_f, :]
 view = matrix
 image = np.zeros(view.shape, dtype=np.uint8)
 image[view == '+'] = 1
 image[view == '~'] = 1
 image[view == '|'] = 1
 image[view == '#'] = 2
-#plt.imshow(image, cmap=CustomCmap)
 plt.imshow(image)
 plt.title('Current max row: ' + str(max_row))
 plt.show()
 
-# Output
-water = np.asarray(np.where(np.logical_or(matrix == '|', matrix == '~'))).shape[1]
-print('There are ' + str(water) + ' squares of water')
+##############
+### Part 1 ###
+##############
+
+matrix_within_y_range = matrix[min_y:, :]
+water_tiles = np.asarray(np.where(np.logical_or(
+    matrix_within_y_range == '|', matrix_within_y_range == '~'))).shape[1]
+print('There are ' + str(water_tiles) + ' tiles of water')
+
+##############
+### Part 2 ###
+##############
+
+matrix_within_y_range = matrix[min_y:, :]
+rest_water_tiles = np.asarray(np.where(matrix_within_y_range == '~')).shape[1]
+print('Only ' + str(rest_water_tiles) + ' tiles of water will not drain out')
