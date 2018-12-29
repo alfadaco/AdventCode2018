@@ -66,10 +66,10 @@ if __name__ == '__main__':
     area_img = np.ndarray(area_array.shape, dtype=np.uint8)
     print('Start ')
 
-    area_img[area_array == AcreType.Ground] = 0
-    area_img[area_array == AcreType.Tree] = 1
-    area_img[area_array == AcreType.Lumberyard] = 2
-    plt.imshow(area_img)
+    area_img[area_array == AcreType.Ground] = 180
+    area_img[area_array == AcreType.Tree] = 70
+    area_img[area_array == AcreType.Lumberyard] = 128
+    plt.imshow(area_img, cmap='tab10', vmin=0, vmax=255)
     plt.title('Start')
     plt.colorbar()
     plt.draw()
@@ -93,10 +93,10 @@ if __name__ == '__main__':
             stop = time.time()
             print('After ' + str(tick) + ' minutes')
             print('Elapsed time ' + str(stop - start) + ' s')
-            area_img[area_array == AcreType.Ground] = 0
-            area_img[area_array == AcreType.Tree] = 1
-            area_img[area_array == AcreType.Lumberyard] = 2
-            plt.imshow(area_img)
+            area_img[area_array == AcreType.Ground] = 180
+            area_img[area_array == AcreType.Tree] = 70
+            area_img[area_array == AcreType.Lumberyard] = 128
+            plt.imshow(area_img, cmap='tab10', vmin=0, vmax=255)
             plt.title('Area after ' + str(tick) + ' minutes')
             plt.draw()
             plt.pause(0.01)
