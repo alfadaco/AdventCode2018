@@ -1,5 +1,8 @@
-import numpy as np
 from enum import Enum
+import numpy as np
+import matplotlib.pyplot as plt
+import time
+
 import data_18dec2018
 
 
@@ -34,20 +37,17 @@ def count_neighbour(map, pos, type):
 
 
 def change_acre_status(map, pos):
-    tree_sorround = count_neighbour(map, pos, AcreType.Tree)
-    ground_sorround = count_neighbour(map, pos, AcreType.Ground)
-    lumberyard_sorround = count_neighbour(map, pos, AcreType.Lumberyard)
-
     new_type = map[pos]
 
     if new_type == AcreType.Ground:
-        if tree_sorround >= 3:
+        if count_neighbour(map, pos, AcreType.Tree) >= 3:
             new_type = AcreType.Tree
     elif new_type == AcreType.Tree:
-        if lumberyard_sorround >= 3:
+        if count_neighbour(map, pos, AcreType.Lumberyard) >= 3:
             new_type = AcreType.Lumberyard
     elif new_type == AcreType.Lumberyard:
-        if not (lumberyard_sorround > 0 and tree_sorround > 0):
+        if count_neighbour(map, pos, AcreType.Lumberyard) == 0 or \
+                count_neighbour(map, pos, AcreType.Tree) == 0:
             new_type = AcreType.Ground
     return new_type
 
@@ -63,10 +63,21 @@ def print_map(map):
 
 if __name__ == '__main__':
     area_array = init_area(data_18dec2018.data_input)
+    area_img = np.ndarray(area_array.shape, dtype=np.uint8)
     print('Start ')
-    print_map(area_array)
 
-    for time in range(1,11):
+    area_img[area_array == AcreType.Ground] = 0
+    area_img[area_array == AcreType.Tree] = 1
+    area_img[area_array == AcreType.Lumberyard] = 2
+    plt.imshow(area_img)
+    plt.title('Start')
+    plt.colorbar()
+    plt.draw()
+    plt.pause(0.01)
+    plt.show(block=False)
+
+    for tick in range(1, 1000000000 + 1):
+        start = time.time()
         new_area = area_array.copy()
         for i_r in range(0, area_array.shape[0]):
             for i_c in range(0, area_array.shape[1]):
@@ -74,9 +85,24 @@ if __name__ == '__main__':
                 new_area[position] = change_acre_status(area_array, position)
 
         area_array = new_area
-        print('After ' + str(time) + ' minutes')
-        print_map(area_array)
 
         count_wood = sum(sum(area_array == AcreType.Tree))
         count_lumberyard = sum(sum(area_array == AcreType.Lumberyard))
-        print('Resource value = ' + str(count_wood) + ' * ' + str(count_lumberyard) + ' = ' + str(count_wood * count_lumberyard))
+
+        if tick % 10 == 0:
+            stop = time.time()
+            print('After ' + str(tick) + ' minutes')
+            print('Elapsed time ' + str(stop - start) + ' s')
+            area_img[area_array == AcreType.Ground] = 0
+            area_img[area_array == AcreType.Tree] = 1
+            area_img[area_array == AcreType.Lumberyard] = 2
+            plt.imshow(area_img)
+            plt.title('Area after ' + str(tick) + ' minutes')
+            plt.draw()
+            plt.pause(0.01)
+            plt.show(block=False)
+            last_score = count_wood * count_lumberyard
+            print('Resource value = ' + str(count_wood) + ' * ' + str(count_lumberyard) + ' = ' + str(last_score))
+
+
+    plt.show()
