@@ -120,55 +120,49 @@ def eval_distance(map, creatures, first_point, second_point):
     distances = select_distances(map, creatures, first_point)
     return distances[second_point]
 
-
-def sort_tuple_list_in_reading_order(tuple_list):
-    if len(tuple_list) > 1:
-        tuple_list.sort(key=lambda tup: tup[1])
-        tuple_list.sort(key=lambda tup: tup[0])
-    return tuple_list
-
-
 def get_adiacent_enemies(map, creatures, current_position, current_type):
     enemies = []
 
+    # Up
     if current_position[0] > 0:
         new_position = (current_position[0] - 1, current_position[1])
         if creatures[new_position] is not None and creatures[new_position].type != current_type:
             enemies.append(new_position)
-    if current_position[1] < map.shape[1] - 1:
-        new_position = (current_position[0], current_position[1] + 1)
-        if creatures[new_position] is not None and creatures[new_position].type != current_type:
-            enemies.append(new_position)
+    # Left
     if current_position[1] > 0:
         new_position = (current_position[0], current_position[1] - 1)
         if creatures[new_position] is not None and creatures[new_position].type != current_type:
             enemies.append(new_position)
+    # Right
+    if current_position[1] < map.shape[1] - 1:
+        new_position = (current_position[0], current_position[1] + 1)
+        if creatures[new_position] is not None and creatures[new_position].type != current_type:
+            enemies.append(new_position)
+    # Down
     if current_position[0] < map.shape[0] - 1:
         new_position = (current_position[0] + 1, current_position[1])
         if creatures[new_position] is not None and creatures[new_position].type != current_type:
             enemies.append(new_position)
 
-
-    #enemies = sort_tuple_list_in_reading_order(enemies)
     return enemies
 
 
 if __name__ == '__main__':
-    debug = True
+    debug = False
 
-    tests = data_15dec2018.map_tests
-    #tests = [data_15dec2018.map_data, -1]
+    #tests = data_15dec2018.map_tests
+    tests = [[data_15dec2018.map_data, -1]]
     for test in tests:
         expected_score = test[1]
         map, creatures, map_size = init_maps(test[0])
 
         game_won = False
         current_round = 0
-        last_complete_round = 0
 
         while not game_won:
             current_round += 1
-            if debug:   print('During round ' + str(current_round))
+            if debug:
+                print('During round ' + str(current_round))
 
             for i_r in range(0, map_size[0]):
                 if game_won: break
@@ -179,6 +173,8 @@ if __name__ == '__main__':
                         continue
                     if creatures[current_position].last_moved >= current_round:
                         continue
+
+                    creatures[current_position].moved(current_round)
 
                     # Check if it nearby has a different creature type
                     neighbour_position = get_adiacent_enemies(map, creatures, current_position, creatures[current_position].type)
@@ -206,15 +202,16 @@ if __name__ == '__main__':
                             if distances[new_position] >= 0 and \
                                     eval_distance(map, creatures, new_position, chosen_point) == min_distance - 1:
                                 direction_chosen = True
-                        # Try to move R
-                        if (not direction_chosen) and current_position[1] < map_size[1] - 1:
-                            new_position = (current_position[0], current_position[1] + 1)
-                            if distances[new_position] >= 0 and \
-                                    eval_distance(map, creatures, new_position, chosen_point) == min_distance - 1:
-                                direction_chosen = True
                         # Try to move L
                         if (not direction_chosen) and current_position[1] > 0:
                             new_position = (current_position[0], current_position[1] - 1)
+                            if distances[new_position] >= 0 and \
+                                    eval_distance(map, creatures, new_position,
+                                                  chosen_point) == min_distance - 1:
+                                direction_chosen = True
+                        # Try to move R
+                        if (not direction_chosen) and current_position[1] < map_size[1] - 1:
+                            new_position = (current_position[0], current_position[1] + 1)
                             if distances[new_position] >= 0 and \
                                     eval_distance(map, creatures, new_position, chosen_point) == min_distance - 1:
                                 direction_chosen = True
@@ -232,7 +229,7 @@ if __name__ == '__main__':
                         if creatures[new_position] is None:
                             creatures[new_position] = creatures[current_position]
                             creatures[current_position] = None
-                            creatures[new_position].moved(current_round)
+
                             current_position = new_position
                         else:
                             print('Error!!!')
@@ -259,6 +256,7 @@ if __name__ == '__main__':
                             if sum([c.type == enemy_type for c in creatures[creatures != None]]) == 0:
                                 winner_type = creatures[current_position].type.value
                                 score = sum([c.hit_points for c in creatures[creatures != None]])
+                                last_complete_round = min([c.last_moved for c in creatures[creatures != None]])
                                 full_score = score*last_complete_round
                                 if debug:
                                     print_position(map, creatures)
@@ -268,7 +266,7 @@ if __name__ == '__main__':
                                 break
 
             if not game_won:
-                last_complete_round = current_round
+                last_complete_round = min([c.last_moved for c in creatures[creatures != None]])
                 if debug or current_round % 100 == 0:
                     print('after round ' + str(current_round))
                     print_position(map, creatures)
@@ -279,4 +277,3 @@ if __name__ == '__main__':
             else:
                 print('test ' + str(tests.index(test)) + ' NOT passed! expected score=' + str(expected_score) + ' real score=' + str(full_score))
 
-        exit()
