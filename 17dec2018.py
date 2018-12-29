@@ -5,11 +5,9 @@ from matplotlib import pyplot as plt
 import data_17dec2018
 data = data_17dec2018.data
 
-# Define colormap
+# Define figure
 plt.figure(1)
 plt.clf()
-colorsList = [(0, 0, 0, 1), (0, 0, 1, 1), (1, 1, 1, 1)]
-CustomCmap = matplotlib.colors.ListedColormap(colorsList)
 
 # Parse input
 idx = 0
@@ -38,17 +36,17 @@ for string in data:
 
     idx += 1
 
-# Remove offset
+# Remove horizontal offset
 for datum in data_parsed:
     datum['x'] = datum['x'] - min_x
-    datum['y'] = datum['y'] - min_y
+    #datum['y'] = datum['y']
 
 # Create matrix
 matrix_shape = (max_y+1, max_x-min_x+1)
 matrix = np.zeros(matrix_shape, dtype='U1')
 matrix[:] = '.'
 for entry in data_parsed:
-    rows = entry['y'] + 1
+    rows = entry['y']
     columns = entry['x']
     matrix[np.ix_(rows, columns)] = '#'
 
@@ -56,6 +54,10 @@ for entry in data_parsed:
 spring_col = 500 - min_x
 spring_row = 0
 matrix[spring_row][spring_col] = '+'
+
+##############
+### Part 1 ###
+##############
 
 # Simulate water falling
 k = 0
@@ -83,7 +85,7 @@ while changed:
                 matrix[row, col-1] = '|'
                 rows_to_check.add(row)
                 changed = True
-            if col < matrix.shape[1] and matrix[row, col+1] == '.':
+            if col < matrix.shape[1]-1 and matrix[row, col+1] == '.':
                 matrix[row, col+1] = '|'
                 rows_to_check.add(row)
                 changed = True
@@ -102,26 +104,28 @@ while changed:
                 changed = True
 
     # Print status
-    if k % 20 == 0:
+    if k % 25 == 0:
         print(max_row)
-#        height = 150
-#        row_i = max(0, max_row-height) + 1
-#        row_f = max(height, max_row) + 2
-#
-#        view = matrix[row_i:row_f, :]
-#        image = np.zeros(view.shape, dtype=np.uint8)
-#        image[view == '~'] = 1
-#        image[view == '|'] = 1
-#        image[view == '#'] = 2
-#        #plt.imshow(image, cmap=CustomCmap)
-#        plt.imshow(image)
-#        plt.title('Current max row: ' + str(max_row))
-#        plt.draw()
-#        plt.show(block=False)
-#        plt.pause(0.0001)
 
     # Advance counter
     k += 1
 
 # Plot
+#height = 150
+#row_i = max(0, max_row-height) + 1
+#row_f = max(height, max_row) + 2
+#view = matrix[row_i:row_f, :]
+view = matrix
+image = np.zeros(view.shape, dtype=np.uint8)
+image[view == '+'] = 1
+image[view == '~'] = 1
+image[view == '|'] = 1
+image[view == '#'] = 2
+#plt.imshow(image, cmap=CustomCmap)
+plt.imshow(image)
+plt.title('Current max row: ' + str(max_row))
 plt.show()
+
+# Output
+water = np.asarray(np.where(np.logical_or(matrix == '|', matrix == '~'))).shape[1]
+print('There are ' + str(water) + ' squares of water')
