@@ -36,6 +36,10 @@ for string in data:
 
     idx += 1
 
+# Make sure not to be on the border
+max_x = max_x + 1
+min_x = min_x - 1
+
 # Remove horizontal offset
 for datum in data_parsed:
     datum['x'] = datum['x'] - min_x
